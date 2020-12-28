@@ -91,7 +91,7 @@ export function makeUpload() {
       // 分片待写入文件
       let pathTmp = `${getNowTempPath()}/${md5}.${nameSuffix(originalname)}`;
       if (!fs.existsSync(pathTmp)) {
-        await fs.promises.writeFile(pathTmp, new Uint8Array());
+        fs.writeFileSync(pathTmp, new Uint8Array());
       }
 
       // 分片上传状态
@@ -111,7 +111,7 @@ export function makeUpload() {
         fs.writeFileSync(pathCfgTmp, new Uint8Array(arr));
       }
 
-      let fileHandle = await fs.promises.open(pathTmp, "r+");
+      let fd = fs.openSync(pathTmp, "r+");
 
       // 读取缓存文件
       let rs = fs.createReadStream(finalPath);
@@ -120,19 +120,18 @@ export function makeUpload() {
         let __position = _position;
         if (chunk instanceof Uint8Array) {
           _position += chunk.length;
-          fs.write(fileHandle.fd, chunk, 0, chunk.length, __position, () => {});
+          fs.write(fd, chunk, 0, chunk.length, __position, () => {});
         }
       });
 
       rs.on("end", async () => {
-        // fs.closeSync(fileHandle.fd);
-        await fileHandle.close();
+        fs.closeSync(fd);
 
         // 删除缓存文件
-        fs.promises.unlink(finalPath);
+        fs.unlinkSync(finalPath);
 
         // 读取上传详情文件查看分片上传状态
-        let buf = await fs.promises.readFile(pathCfgTmp);
+        let buf = fs.readFileSync(pathCfgTmp);
 
         let arr = pickTypedArrayBuffer(buf);
         let byteOffset = 0;
@@ -153,14 +152,14 @@ export function makeUpload() {
           });
         }
         // 写入修改后的状态
-        await fs.promises.writeFile(pathCfgTmp, new Uint8Array(arr));
-        // fs.writeFileSync(pathCfgTmp, new Uint8Array(arr));
+        // await fs.promises.writeFile(pathCfgTmp, new Uint8Array(arr));
+        fs.writeFileSync(pathCfgTmp, new Uint8Array(arr));
 
         // 上传完成后将文件移动到正式文件夹下，并删除分片状态文件
         if (fi.filter((f) => f.complete === 1).length === +chunkCount) {
-          fs.promises.unlink(pathCfgTmp);
+          fs.unlinkSync(pathCfgTmp);
           let _path = `${getUploadsPath()}/${md5}.${nameSuffix(originalname)}`;
-          await fs.promises.rename(pathTmp, _path);
+          fs.renameSync(pathTmp, _path);
           appendField(req.body[fieldname], "path", _path);
         }
 
