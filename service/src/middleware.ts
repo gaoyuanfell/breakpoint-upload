@@ -6,8 +6,10 @@ import { Request, Response, NextFunction } from "express";
 import {
   getNowTempPath,
   getUploadsPath,
+  mkdirsSync,
   nameSuffix,
   pickTypedArrayBuffer,
+  uintCodeCfg,
 } from "./uitl";
 const uuid = require("uuid");
 const appendField = require("append-field");
@@ -31,41 +33,37 @@ export function makeField() {
       appendField(req.body, fieldname, file);
       let outStream = fs.createWriteStream(finalPath);
       fileStream.pipe(outStream);
+      fileStream.on("end", () => {
+        outStream.close();
+      });
     });
     busboy.on("field", (fieldname, value) => {
       appendField(req.body, fieldname, value);
     });
     busboy.on("finish", () => {
+      req.unpipe(busboy);
       next();
     });
     req.pipe(busboy);
   };
 }
 
-function chunkFinish(
-  pathCfgTmp: string,
-  chunkCount: number,
-  chunkIndex: number
-) {
+function chunkFinish(pathCfgTmp: string, chunkIndex: number) {
   // 读取上传详情文件查看分片上传状态
   let buf = fs.readFileSync(pathCfgTmp);
 
   let arr = pickTypedArrayBuffer(buf);
-  let byteOffset = 0;
-  let fi = [];
-  // let chunkCount = arr.byteLength / 12;
-  for (let index = 0; index < chunkCount; index++) {
-    byteOffset = index * 12;
-    let a = new Uint32Array(arr, byteOffset);
-    let b = new Uint8Array(arr, byteOffset + 4);
+  let fi: any[] = [];
+  uintCodeCfg(arr, (uint32, uint8, index) => {
     if (index === +chunkIndex) {
-      b[0] = 1;
+      uint8[0] = 1;
     }
     fi.push({
-      index: a[0],
-      complete: b[0],
+      index: uint32[0],
+      complete: uint8[0],
     });
-  }
+  });
+
   // 写入修改后的状态
   fs.writeFileSync(pathCfgTmp, new Uint8Array(arr));
   return fi;
@@ -110,7 +108,7 @@ function readCacheFile(
     // 删除缓存文件
     fs.unlinkSync(finalPath);
 
-    let fi = chunkFinish(pathCfgTmp, +chunkCount, +chunkIndex);
+    let fi = chunkFinish(pathCfgTmp, +chunkIndex);
     // 上传完成后将文件移动到正式文件夹下，并删除分片状态文件
     if (fi.filter((f) => f.complete === 1).length === +chunkCount) {
       fs.unlinkSync(pathCfgTmp);
@@ -118,6 +116,8 @@ function readCacheFile(
       fs.renameSync(pathTmp, _path);
       appendField(req.body[fieldname], "path", _path);
     }
+
+    rs.close();
     next();
   });
 }
@@ -146,6 +146,10 @@ export function makeUpload() {
       fieldname
     ];
 
+    if (!fs.existsSync(getNowTempPath())) {
+      mkdirsSync(getNowTempPath());
+    }
+
     // 分片待写入文件
     let pathTmp = `${getNowTempPath()}/${md5}.${nameSuffix(originalname)}`;
     if (!fs.existsSync(pathTmp)) {
@@ -158,14 +162,10 @@ export function makeUpload() {
     )}.cfg`;
     if (!fs.existsSync(pathCfgTmp)) {
       let arr = new ArrayBuffer(+chunkCount * 12);
-      let byteOffset = 0;
-      for (let index = 0; index < +chunkCount; index++) {
-        byteOffset = index * 12;
-        let u = new Uint32Array(arr, byteOffset);
-        let b = new Uint8Array(arr, byteOffset + 4);
-        u[0] = index;
-        b[0] = 0;
-      }
+      uintCodeCfg(arr, (uint32, uint8, index) => {
+        uint32[0] = index;
+        uint8[0] = 0;
+      });
       fs.writeFileSync(pathCfgTmp, new Uint8Array(arr));
     }
 

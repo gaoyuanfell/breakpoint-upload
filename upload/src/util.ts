@@ -59,7 +59,7 @@ export async function fileMd5(file: File) {
   return new Promise<string>((r, j) => {
     let f = new FileReader();
     let arrHash = new SparkMd5.ArrayBuffer();
-    let chunks = blobSlice(file, 20 * 1024 * 1024);
+    let chunks = fileChunk2(blobSlice(file, 20 * 1024 * 1024));
     const queue = () => {
       let chunk = chunks.shift();
       if (!chunk) {
@@ -79,4 +79,16 @@ export async function fileMd5(file: File) {
     };
     queue();
   });
+}
+
+// 获取多个分片中的其中三个分片来计算md5
+export function fileChunk2(chunks: ChunksType[]) {
+  if (chunks.length < 3) {
+    return chunks;
+  }
+  let c = [];
+  let length = chunks.length;
+  c.push(chunks[0]);
+  c.push(chunks[length - 1]);
+  return c;
 }

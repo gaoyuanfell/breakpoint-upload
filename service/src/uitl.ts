@@ -99,3 +99,17 @@ export const pickTypedArrayBuffer = (bytes: Uint8Array) => {
     bytes.byteOffset + bytes.length * bytes.BYTES_PER_ELEMENT
   );
 };
+
+export const uintCodeCfg = (
+  arraybuffer: ArrayBuffer,
+  callback: (uint32: Uint32Array, uint8: Uint8Array, index: number) => void
+) => {
+  let chunkCount = arraybuffer.byteLength / 12;
+  let byteOffset = 0;
+  for (let index = 0; index < chunkCount; index++) {
+    byteOffset = index * 12;
+    let a = new Uint32Array(arraybuffer, byteOffset);
+    let b = new Uint8Array(arraybuffer, byteOffset + 4);
+    callback(a, b, index);
+  }
+};

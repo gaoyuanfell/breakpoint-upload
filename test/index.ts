@@ -20,14 +20,31 @@ fileUploadRef!.onclick = () => {
   fileRef.value = "";
 };
 
+let _stop: Function;
+let fileStopRef = document.getElementById("fileStop");
+fileStopRef!.onclick = () => {
+  if (typeof _stop === "function") _stop();
+};
+
+let _start: Function;
+let fileRenewalRef = document.getElementById("fileRenewal");
+fileRenewalRef!.onclick = () => {
+  if (typeof _start === "function") _start();
+};
+
 function uploadFile(file: File) {
-  let { execute, start, stop, next, done } = queueUpload(file);
+  let { execute, start, stop, next, done } = queueUpload(file, {
+    chunkSize: 2 * 1024 * 1024,
+    concurrent: 12,
+    fieldname: "file",
+  });
+  _stop = stop;
+  _start = start;
   const task = async () => {
     let md5 = await fileMd5(file);
-    // done(async () => {
-    //   let res = await HTTP.post(baseUrl + "/file/merge", { md5 }).resule();
-    //   console.info(res);
-    // });
+    done(async () => {
+      console.info("完成");
+    });
     let res = await HTTP.post(baseUrl + "/file/renewal", {
       md5,
       filename: file.name,
@@ -57,6 +74,7 @@ function uploadFile(file: File) {
       upload();
     });
     start();
+    console.info("开始");
   };
   task();
 }
