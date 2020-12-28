@@ -15,10 +15,8 @@ import {
   pickTypedArrayBuffer,
   uintCodeCfg,
 } from "./uitl";
-const uuid = require("uuid");
 
 const app = express();
-console.info(path.join(__dirname, "../uploads/"));
 app.use("/uploads", express.static(path.join(__dirname, "../uploads/")));
 
 app.use(bodyParser.json()); // for parsing application/json

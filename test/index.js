@@ -8,7 +8,6 @@ fileUploadRef.onclick = () => {
         return;
     for (let index = 0; index < files.length; index++) {
         const file = files[index];
-        console.info(file);
         uploadFile(file);
     }
     fileRef.value = "";
@@ -49,7 +48,6 @@ function uploadFile(file) {
             return;
         }
         let renewalArr = res.data.list;
-        console.info(renewalArr);
         execute((item) => {
             if (!item)
                 return;
@@ -64,7 +62,6 @@ function uploadFile(file) {
                 console.info(res);
                 next();
             };
-            console.info();
             upload();
         });
         start();

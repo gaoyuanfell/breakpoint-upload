@@ -129,7 +129,7 @@ function readCacheFile(
  *  然后再创建一个记录分片上传记录
  */
 export function makeUpload() {
-  return function upload(req: Request, res: Response, next: NextFunction) {
+  return function Upload(req: Request, res: Response, next: NextFunction) {
     let {
       sizes,
       size,

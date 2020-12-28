@@ -14,7 +14,6 @@ fileUploadRef!.onclick = () => {
   if (!files) return;
   for (let index = 0; index < files.length; index++) {
     const file = files[index];
-    console.info(file);
     uploadFile(file);
   }
   fileRef.value = "";
@@ -55,11 +54,9 @@ function uploadFile(file: File) {
       return;
     }
     let renewalArr = res.data.list;
-    console.info(renewalArr);
     execute((item) => {
       if (!item) return;
       item.set("md5", md5);
-
       let chunkIndex = item.get("chunkIndex");
       if (chunkIndex && renewalArr.indexOf(+chunkIndex) !== -1) {
         next();
@@ -70,7 +67,6 @@ function uploadFile(file: File) {
         console.info(res);
         next();
       };
-      console.info();
       upload();
     });
     start();
