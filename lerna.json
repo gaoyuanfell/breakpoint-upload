@@ -1,0 +1,4 @@
+{
+  "packages": ["service", "upload", "test"],
+  "version": "0.0.1"
+}

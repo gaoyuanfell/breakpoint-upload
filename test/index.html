@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <script>
+      document.domain = document.domain;
+      function resizeFun() {
+        let viewport = document.querySelector("meta[name=viewport]");
+        //下面是根据设备像素设置viewport
+        let scale = 1 / window.devicePixelRatio;
+        viewport.setAttribute(
+          "content",
+          `width=device-width,initial-scale=${scale}, maximum-scale=${scale}, minimum-scale=${scale}, user-scalable=no`
+        );
+        let docEl = document.documentElement;
+        let fontsize = 32 * (docEl.clientWidth / 375) + "px";
+        docEl.style.fontSize = fontsize;
+      }
+      window.onresize = resizeFun;
+      resizeFun();
+    </script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      axios.interceptors.response.use(
+        function (response) {
+          return response.data;
+        },
+        function (error) {
+          return Promise.reject(error);
+        }
+      );
+    </script>
+  </head>
+  <body>
+    <input type="file" id="file" name="file" />
+
+    <button id="fileUpload">上传</button>
+    <button id="fileRenewal">续传</button>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
