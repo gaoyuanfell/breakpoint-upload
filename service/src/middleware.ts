@@ -162,8 +162,8 @@ export function makeUpload() {
       for (let index = 0; index < +chunkCount; index++) {
         byteOffset = index * 12;
         let u = new Uint32Array(arr, byteOffset);
-        u[0] = index;
         let b = new Uint8Array(arr, byteOffset + 4);
+        u[0] = index;
         b[0] = 0;
       }
       fs.writeFileSync(pathCfgTmp, new Uint8Array(arr));
