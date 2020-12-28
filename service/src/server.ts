@@ -4,13 +4,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { makeField, makeUpload } from "./middleware";
-import multer from "multer";
 import {
-  deleteFolderRecursive,
-  fileMerge,
   getNowTempPath,
   getUploadsPath,
-  mkdirsSync,
   nameSuffix,
   pickTypedArrayBuffer,
   uintCodeCfg,

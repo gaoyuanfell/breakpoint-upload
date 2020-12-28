@@ -48,8 +48,9 @@ export function makeField() {
   };
 }
 
-function chunkFinish(pathCfgTmp: string, chunkIndex: number) {
+async function chunkFinish(pathCfgTmp: string, chunkIndex: number) {
   // 读取上传详情文件查看分片上传状态
+  // 保证分片状态文件同步读取和写入
   let buf = fs.readFileSync(pathCfgTmp);
 
   let arr = pickTypedArrayBuffer(buf);
@@ -69,7 +70,7 @@ function chunkFinish(pathCfgTmp: string, chunkIndex: number) {
   return fi;
 }
 
-function readCacheFile(
+async function readCacheFile(
   req: Request,
   next: NextFunction,
   pathTmp: string,
@@ -91,7 +92,7 @@ function readCacheFile(
     fieldname
   ];
 
-  let fd = fs.openSync(pathTmp, "r+");
+  let fileHandle = await fs.promises.open(pathTmp, "r+");
   // 读取缓存文件
   let rs = fs.createReadStream(finalPath);
   let _position = +position;
@@ -99,21 +100,21 @@ function readCacheFile(
     let __position = _position;
     if (chunk instanceof Uint8Array) {
       _position += chunk.length;
-      fs.write(fd, chunk, 0, chunk.length, __position, () => {});
+      fs.write(fileHandle.fd, chunk, 0, chunk.length, __position, () => {});
     }
   });
   rs.on("end", async () => {
-    fs.closeSync(fd);
+    await fileHandle.close();
 
     // 删除缓存文件
-    fs.unlinkSync(finalPath);
+    fs.promises.unlink(finalPath);
 
-    let fi = chunkFinish(pathCfgTmp, +chunkIndex);
+    let fi = await chunkFinish(pathCfgTmp, +chunkIndex);
     // 上传完成后将文件移动到正式文件夹下，并删除分片状态文件
     if (fi.filter((f) => f.complete === 1).length === +chunkCount) {
-      fs.unlinkSync(pathCfgTmp);
+      fs.promises.unlink(pathCfgTmp);
       let _path = `${getUploadsPath()}/${md5}.${nameSuffix(originalname)}`;
-      fs.renameSync(pathTmp, _path);
+      await fs.promises.rename(pathTmp, _path);
       appendField(req.body[fieldname], "path", _path);
     }
 
