@@ -62,7 +62,7 @@ export async function fileMerge(target: string, result: string) {
       let cws = fs.createWriteStream(
         path.join(`${target}.${nameSuffix(files[0])}`),
         {
-          highWaterMark: 2 * 1024 * 1024, // 2 * 1024 * 1024
+          highWaterMark: 2 * 1024 * 1024,
         }
       );
       for (let index = 0; index < files.length; index++) {
@@ -76,7 +76,7 @@ export async function fileMerge(target: string, result: string) {
 async function forEachWrite(cws: fs.WriteStream, result: string, item: string) {
   return new Promise((resolve, reject) => {
     let crs = fs.createReadStream(path.join(result, item), {
-      highWaterMark: 2 * 1024 * 1024, // 2 * 1024 * 1024
+      highWaterMark: 2 * 1024 * 1024,
     });
     crs.on("error", (err) => {
       crs.close();

@@ -8,38 +8,6 @@ type Result<T> = {
   data: T;
 };
 
-// https://fetch.spec.whatwg.org/
-// function asd(file: File) {
-//   const stream = new ReadableStream({
-//     start(controller) {
-//       let r = new FileReader();
-//       r.onload = (e) => {
-//         console.info(r.result);
-//         console.info(r.readyState);
-//         if (r.readyState === 2) {
-//           controller.close();
-//           return;
-//         }
-//         controller.enqueue(r.result);
-//       };
-//       r.readAsArrayBuffer(file);
-//     },
-//   });
-
-//   let r = new Request(baseUrl + "/file/test", {
-//     method: "POST",
-//     body: stream,
-//     keepalive: true,
-//     headers: { "Content-Type": "multipart/form-data" },
-//   });
-
-//   setTimeout(() => {
-//     fetch(r.clone())
-//       .then((response) => response.json())
-//       .then((result) => console.info(result));
-//   }, 1000);
-// }
-
 let fileUploadRef = document.getElementById("fileUpload");
 fileUploadRef!.onclick = () => {
   let files = fileRef.files;

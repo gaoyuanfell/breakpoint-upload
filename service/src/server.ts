@@ -15,12 +15,12 @@ import {
 const app = express();
 app.use("/uploads", express.static(path.join(__dirname, "../uploads/")));
 
-app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
     extended: false,
   })
-); // for parsing application/x-www-form-urlencoded
+);
 
 app.use(cors()); //跨域
 

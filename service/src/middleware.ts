@@ -126,8 +126,8 @@ async function readCacheFile(
 /***
  *
  * 写文件
- *  创建一个和源文件同样大小的种子文件
- *  然后再创建一个记录分片上传记录
+ * 创建一个和源文件同样大小的种子文件
+ * 然后再创建一个记录分片上传记录
  */
 export function makeUpload() {
   return function Upload(req: Request, res: Response, next: NextFunction) {

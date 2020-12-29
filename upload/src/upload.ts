@@ -8,8 +8,6 @@ type _UploadOptions = {
   chunkSize: number;
   concurrent: number;
   fieldname: string;
-  // beforeUpload: (item: FormData, file: File) => void;
-  // afterUpload: (item: FormData, file: File) => void;
 };
 
 type UploadOptions = Partial<_UploadOptions>;

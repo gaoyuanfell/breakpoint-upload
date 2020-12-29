@@ -13,15 +13,6 @@ interface HTTPConstructor {
 // 可以考虑用ajax实现，毕竟这个不支持上传进度
 async function _fetch(request: Request) {
   let response = await fetch(request);
-  // const step = async () => {
-  //   let stream = response.body!.getReader();
-  //   let result = await stream.read();
-  //   while (!result.done) {
-  //     console.info(result.value);
-  //     result = await stream.read();
-  //   }
-  // };
-  // step();
   let data = await response.json();
   return data;
 }

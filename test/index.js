@@ -1,35 +1,6 @@
 import { fileMd5, HTTP, queueUpload } from "@breakpoint/upload";
 const baseUrl = "http://127.0.0.1:3001";
 let fileRef = document.getElementById("file");
-// https://fetch.spec.whatwg.org/
-// function asd(file: File) {
-//   const stream = new ReadableStream({
-//     start(controller) {
-//       let r = new FileReader();
-//       r.onload = (e) => {
-//         console.info(r.result);
-//         console.info(r.readyState);
-//         if (r.readyState === 2) {
-//           controller.close();
-//           return;
-//         }
-//         controller.enqueue(r.result);
-//       };
-//       r.readAsArrayBuffer(file);
-//     },
-//   });
-//   let r = new Request(baseUrl + "/file/test", {
-//     method: "POST",
-//     body: stream,
-//     keepalive: true,
-//     headers: { "Content-Type": "multipart/form-data" },
-//   });
-//   setTimeout(() => {
-//     fetch(r.clone())
-//       .then((response) => response.json())
-//       .then((result) => console.info(result));
-//   }, 1000);
-// }
 let fileUploadRef = document.getElementById("fileUpload");
 fileUploadRef.onclick = () => {
     let files = fileRef.files;
