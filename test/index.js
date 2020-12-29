@@ -1,6 +1,35 @@
 import { fileMd5, HTTP, queueUpload } from "@breakpoint/upload";
 const baseUrl = "http://127.0.0.1:3001";
 let fileRef = document.getElementById("file");
+// https://fetch.spec.whatwg.org/
+// function asd(file: File) {
+//   const stream = new ReadableStream({
+//     start(controller) {
+//       let r = new FileReader();
+//       r.onload = (e) => {
+//         console.info(r.result);
+//         console.info(r.readyState);
+//         if (r.readyState === 2) {
+//           controller.close();
+//           return;
+//         }
+//         controller.enqueue(r.result);
+//       };
+//       r.readAsArrayBuffer(file);
+//     },
+//   });
+//   let r = new Request(baseUrl + "/file/test", {
+//     method: "POST",
+//     body: stream,
+//     keepalive: true,
+//     headers: { "Content-Type": "multipart/form-data" },
+//   });
+//   setTimeout(() => {
+//     fetch(r.clone())
+//       .then((response) => response.json())
+//       .then((result) => console.info(result));
+//   }, 1000);
+// }
 let fileUploadRef = document.getElementById("fileUpload");
 fileUploadRef.onclick = () => {
     let files = fileRef.files;
@@ -27,7 +56,7 @@ fileRenewalRef.onclick = () => {
 function uploadFile(file) {
     let { execute, start, stop, next, done } = queueUpload(file, {
         chunkSize: 2 * 1024 * 1024,
-        concurrent: 12,
+        concurrent: 6,
         fieldname: "file",
     });
     _stop = stop;
@@ -35,7 +64,7 @@ function uploadFile(file) {
     const task = async () => {
         let md5 = await fileMd5(file);
         done(async () => {
-            console.info("完成");
+            console.info("finish");
         });
         let res = await HTTP.post(baseUrl + "/file/renewal", {
             md5,
@@ -65,7 +94,7 @@ function uploadFile(file) {
             upload();
         });
         start();
-        console.info("开始");
+        console.info("start");
     };
     task();
 }

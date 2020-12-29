@@ -81,7 +81,7 @@ export async function fileMd5(file: File) {
   });
 }
 
-// 获取多个分片中的其中三个分片来计算md5
+// 获取多个分片中的其中二个分片来计算md5
 export function fileChunk2(chunks: ChunksType[]) {
   if (chunks.length < 3) {
     return chunks;
